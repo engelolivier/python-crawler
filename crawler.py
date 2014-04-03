@@ -10,7 +10,6 @@ class Crawler:
     urls = []
     urls_done = [] 
     count = 0
-    test = "ok"
  
     def __init__(self, domain):
         self.domain = domain
@@ -70,29 +69,35 @@ class Crawler:
  
                         # Récursif
                         self.crawl(href)
+
+    def build_sitemap(self):
+        # On construit le XML
+        urlset = etree.Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" )
+        for u in self.getUrls():
+            url = etree.Element('url')
+            urlset.append(url)
+            # loc
+            loc = etree.Element('loc')
+            loc.text = str(u)
+            url.append(loc)
+            # changefreq
+            changefreq = etree.Element('changefreq')
+            changefreq.text = 'hourly'
+            url.append(changefreq)
+          
+        code = etree.tostring(urlset, pretty_print=True)
+          
+        # On génère le fichier sitemap.xml dans le meme dossier
+        f = open('sitemap.xml', 'w+')
+        f.write(code)
+
   
 # On construit une liste d'url
 crawler = Crawler("http://localhost:8000")
 # Point de départ
 crawler.crawl("http://localhost:8000/shop/")
+# Construction du sitemap
+crawler.build_sitemap()
  
  
-# On construit le XML
-urlset = etree.Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" )
-for u in crawler.getUrls():
-    url = etree.Element('url')
-    urlset.append(url)
-    # loc
-    loc = etree.Element('loc')
-    loc.text = str(u)
-    url.append(loc)
-    # changefreq
-    changefreq = etree.Element('changefreq')
-    changefreq.text = 'hourly'
-    url.append(changefreq)
-  
-code = etree.tostring(urlset, pretty_print=True)
-  
-# On génère le fichier sitemap.xml
-f = open('sitemap.xml', 'w+')
-f.write(code)
+
