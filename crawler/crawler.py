@@ -16,21 +16,33 @@ class Crawler:
         self.count = 0
  
     def getUrls(self):
+        """
+        Retourne les URLS trouvé par le crawler
+        """
         return self.urls
 
     def print_info(self, *args, **kwargs):
+        """
+        Affiche les informations lors de l'execution du script
+        """
+        pass
 
-        html = kwargs["html"]
-        url = kwargs["url"]
-        time = kwargs["time"]
+    def end_crawl(self):
+        """
+        Cette fonction est executée à la fin du crawl
+        """
+        pass
 
-        try:
-            print "%s;%s;%.1f;%s;" % (str(self.count).ljust(3),str(html.getcode()).ljust(4), time, url.split(self.domain)[1], )  
-
-        except:
-            print "Erreur info %s"
 
     def crawl(self, url):
+
+        self.run(url)
+        self.end_crawl()
+
+    def run(self, url):
+        """
+        Parcours les pages du site en suivant les liens
+        """
           
         # On limite le script à 10000 itérations
         if self.count > 9999:
@@ -81,10 +93,32 @@ class Crawler:
                         self.urls_done.append(href)
  
                         # Récursif
-                        self.crawl(href)
+                        self.run(href)
 
-    def build_sitemap(self):
-        # On construit le XML
+
+class CrawlerSiteMap(Crawler):
+    """
+    Construit le siteMap du site
+    """
+
+    def print_info(self, *args, **kwargs):
+
+        html = kwargs["html"]
+        url = kwargs["url"]
+        time = kwargs["time"]
+
+        try:
+            print "%s;%s;%.1f;%s;" % (str(self.count).ljust(3),str(html.getcode()).ljust(4), time, url.split(self.domain)[1], )  
+
+        except:
+            print "Erreur info %s"
+
+
+    def end_crawl(self):
+        """
+        Construction du sitemap.xml
+        """
+        print "Construction du XML..."
         urlset = etree.Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" )
         for u in self.getUrls():
             url = etree.Element('url')
@@ -101,11 +135,18 @@ class Crawler:
         code = etree.tostring(urlset, pretty_print=True)
           
         # On génère le fichier sitemap.xml dans le meme dossier
-        f = open('sitemap.xml', 'w+')
-        f.write(code)
+        try:
+            f = open('sitemap.xml', 'w+')
+            f.write(code)
+        except:
+            print "Erreur lors de la création du sitemap.xml"
+        else:
+            print "Sitemap.xml crée avec succès!"
 
-
-class Crawler404(Crawler):
+class CrawlerInfo(Crawler):
+    """
+    Affiche les informations de base de chaque page
+    """
 
     def print_info(self, *args, **kwargs):
 
@@ -114,7 +155,24 @@ class Crawler404(Crawler):
         time = kwargs["time"]
 
         try:
-            print "%s;%s;%s;" % (str(self.count).ljust(3),str(html.getcode()), url )  
+            print "%s;%s;%.1f;%s;" % (str(self.count).ljust(3),str(html.getcode()).ljust(4), time, url.split(self.domain)[1], )  
+
+        except:
+            print "Erreur info %s"
+
+
+class Crawler404(Crawler):
+    """
+    Affiche uniquement les codes de retour différent de 200
+    """
+    def print_info(self, *args, **kwargs):
+
+        html = kwargs["html"]
+        url = kwargs["url"]
+        
+        try:
+            if str(code) <> "200":
+                print "%s;%s;%s;" % (str(self.count).ljust(3),str(html.getcode()), url )  
 
         except:
             print "Erreur info %s"
