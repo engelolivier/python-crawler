@@ -10,6 +10,7 @@ class Crawler:
     urls = []
     urls_done = [] 
     count = 0
+    test = "ok"
  
     def __init__(self, domain):
         self.domain = domain
