@@ -105,13 +105,16 @@ class Crawler:
         f.write(code)
 
 
-###############
-#   Exemple   #
-###############
+class Crawler404(Crawler):
 
-# On construit une liste d'url
-crawler = Crawler("http://localhost:8000")
-# Point de départ
-crawler.crawl("http://localhost:8000/shop/")
-# Construction du sitemap
-crawler.build_sitemap()
+    def print_info(self, *args, **kwargs):
+
+        html = kwargs["html"]
+        url = kwargs["url"]
+        time = kwargs["time"]
+
+        try:
+            print "%s;%s;%s;" % (str(self.count).ljust(3),str(html.getcode()), url )  
+
+        except:
+            print "Erreur info %s"
