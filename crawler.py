@@ -15,7 +15,6 @@ class Crawler:
         self.domain = domain
         self.count = 0
  
- 
     def getUrls(self):
         return self.urls
  
@@ -39,8 +38,10 @@ class Crawler:
             # On affiche des informations concernant le déroulement du script:
             # compteur ; code HTTPRequest ; temps exécution ; url
             print "%s;%s;%.1f;%s;" % (str(self.count).ljust(3),str(html.getcode()).ljust(4), t2, url.split(self.domain)[1], )
+        
         except:
             print "Erreur %s" % (url,)
+            
         else:
             soup = BeautifulSoup(html)
             for link in soup.findAll('a'):
