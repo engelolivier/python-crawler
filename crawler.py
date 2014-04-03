@@ -72,9 +72,9 @@ class Crawler:
                         self.crawl(href)
   
 # On construit une liste d'url
-crawler = Crawler("http://xxx")
+crawler = Crawler("http://localhost:8000")
 # Point de départ
-crawler.crawl("http://xxx/shop/")
+crawler.crawl("http://localhost:8000/shop/")
  
  
 # On construit le XML
