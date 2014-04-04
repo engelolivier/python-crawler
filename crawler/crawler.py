@@ -27,73 +27,75 @@ class Crawler:
         """
         pass
 
-    def end_crawl(self):
-        """
-        Cette fonction est executée à la fin du crawl
-        """
-        pass
-
-
-    def crawl(self, url):
-
-        self.run(url)
-        self.end_crawl()
-
     def run(self, url):
+
+        gen = self.crawl(url)      
+        for i in range(500):
+            try:
+                gen.next()
+            except:
+                pass
+
+    def crawl(self, urls):
         """
         Parcours les pages du site en suivant les liens
-        """
+        """  
+        if not type(urls) is list:
+            urls = [urls]
+              
+        for url in urls:
+            # Si le domaine est différent, on stoppe le script
+            if str(url).startswith(self.domain):
+                
           
-        # On limite le script à 10000 itérations
-        if self.count > 9999:
-            return None
-      
-        # Si le domaine est différent, on stoppe le script
-        if not str(url).startswith(self.domain):
-            return None
-      
-        # On récupère/parse le code HTML
-        try:
-            t1 = time.time()
-            html = urllib2.urlopen(url)
-            if str(html.info()).find("text/html") == -1:
-                return None
-            t2 = time.time() - t1
-
-            # On écrit les informations que l'on souhaite
-            data = { "html" : html, "url" : url, "time" : t2  }
-            self.print_info(**data)
-        
-        except:
-            print "Erreur %s" % (url,)
+                # On récupère/parse le code HTML
+                try:
+                    t1 = time.time()
+                    html = urllib2.urlopen(url)
+                    if str(html.info()).find("text/html") == -1:
+                        raise
+                    t2 = time.time() - t1
+    
+                    # On écrit les informations que l'on souhaite
+                    data = { "html" : html, "url" : url, "time" : t2  }
+                    self.count+=1
+                    self.print_info(**data)
+                    #print data
+                    
+                except:
+                    print "Erreur %s" % (url,)
+                    
             
-        else:
-            soup = BeautifulSoup(html)
-            for link in soup.findAll('a'):
-      
-                href = link.get('href')
-                if href and href <> "#" and not href in self.urls:
-      
-                    # On ajoute http si manquant
-                    if href.startswith("/"):
-                        href = self.domain + href
-                    elif not href.startswith("http"):
-                        try:
-                            string_to_delete = url.split("/")[-1:][0]
-                            href = url.split(string_to_delete)[0] + href
-                        except:
-                            pass
-      
-                    # Récursif si l'adresse n'a pas encore été traité
-                    if not href in self.urls_done:
-                         
-                        # On ajoute l'adresse à la liste
-                        self.urls.append( href )
-                        self.count+=1
-                        self.urls_done.append(href)
- 
-                        # Récursif
-                        self.run(href)
+                else:
+                    soup = BeautifulSoup(html)
+                    new_urls = []
+                    for link in soup.findAll('a'):
+                        href = link.get('href')
+                        if href and href <> "#" and not href in self.urls:
+                            
+                            # On ajoute http si manquant
+                            if href.startswith("/"):
+                                href = self.domain + href
+                            elif not href.startswith("http"):
+                                try:
+                                    string_to_delete = url.split("/")[-1:][0]
+                                    href = url.split(string_to_delete)[0] + href
+                                except:
+                                    pass
+                            
+                            # Récursif si l'adresse n'a pas encore été traité
+                            if not href in self.urls_done:
+                            
+                                # On ajoute l'adresse à la liste
+                                self.urls.append( href )
+                                
+                                self.urls_done.append(href)
+                                new_urls.append(href)
+                                
+                    yield url
+                    for u in self.crawl(new_urls):
+                        yield u
+
 
 
 class CrawlerSiteMap(Crawler):
@@ -114,7 +116,10 @@ class CrawlerSiteMap(Crawler):
             print "Erreur info %s"
 
 
-    def end_crawl(self):
+    def run(self, url):
+
+        Crawler.run(self, url)
+
         """
         Construction du sitemap.xml
         """
@@ -143,6 +148,7 @@ class CrawlerSiteMap(Crawler):
         else:
             print "Sitemap.xml crée avec succès!"
 
+
 class CrawlerInfo(Crawler):
     """
     Affiche les informations de base de chaque page
@@ -169,6 +175,7 @@ class Crawler404(Crawler):
 
         html = kwargs["html"]
         url = kwargs["url"]
+        code = html.getcode()
         
         try:
             if str(code) <> "200":
