@@ -1,9 +1,4 @@
 #-*- coding: utf-8 -*-
-"""Premier exemple avec Tkinter.
-
-On crée une fenêtre simple qui souhaite la bienvenue à l'utilisateur.
-
-"""
 
 # On importe Tkinter
 import os
@@ -11,7 +6,6 @@ import sys
 from Tkinter import *
 
 def we_are_frozen():
-    # All of the modules are built-in to the interpreter, e.g., by py2exe
     return hasattr(sys, "frozen")
 
 def module_path():
@@ -27,12 +21,7 @@ sys.path.insert(0, module_path)
 from crawler import Crawler
 
 
-
-
 class Interface(Frame):
-    
-    """Notre fenêtre principale.
-    Tous les widgets sont stockés comme attributs de cette fenêtre."""
     
     def __init__(self, window, **kwargs):
         Frame.__init__(self, window, width=768, height=576, **kwargs)
@@ -43,22 +32,6 @@ class Interface(Frame):
         # Création de nos widgets
         self.message = Label(self, text="Veuillez indiquer la racine du site")
         self.message.pack()
-
-
-
-        """
-        # Dans Fenetre nous allons créer un objet type Canvas qui se nomme zone_dessin
-        # Nous donnons des valeurs aux propriétés "width", "height", "bg", "bd", "relief"
-        zone_dessin = Canvas(window,width=500,height=500,
-                                bg='yellow',bd=8,relief="ridge")
-        zone_dessin.pack() #Affiche le Canvas
-         
-        #Nous allons maintenant utiliser quelques méthodes du widget "zone_dessin"
-        zone_dessin.create_line(0,0,500,500,fill='red',width=4) # Dessine une ligne
-        zone_dessin.create_line(0,500,500,0,fill='red',width=4) # Dessine une ligne
-        zone_dessin.create_rectangle(150,150,350,350) # Dessine un rectangle
-        zone_dessin.create_oval(150,150,350,350,fill='white',width=4) # Dessine un cercle
-        """
 
         v = StringVar()
         v.set("http://localhost:8000")
@@ -87,17 +60,10 @@ class Interface(Frame):
         # self.valider()
     
     def valider(self):
-        """Il y a eu un clic sur le bouton.
-        On change la valeur du label message."""
         
         self.nb_clic += 1
-        # self.message["text"] = "{}.".format(self.url.get())
-
-        #self.loading.insert(INSERT, "Chargement...")
-
         gen = CrawlerGraph(self.domain.get()).crawl(self.url.get())  
-        # print dir(crawler)
-        #gen = crawler.crawl("http://localhost:8000")    
+
 
         for i in range(9999):
           
@@ -107,16 +73,10 @@ class Interface(Frame):
                 self.loading.insert(INSERT, data)
                 self.loading.see(END)
                 self.loading.update_idletasks()
-                # self.loading.pack()
-                # self.loading.see(END)
+
             except StopIteration:
                 print "Erreur fin itération"
         
-
-
-        #crawler.crawl( self.url.get() )
-
-
 
 class CrawlerGraph(Crawler):
     """
@@ -130,8 +90,6 @@ class CrawlerGraph(Crawler):
         
         try:
             print url
-            #print url
-            #self.content=url
 
         except:
             print "Erreur info %s"
