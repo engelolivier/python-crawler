@@ -7,13 +7,14 @@ import time
  
 class Crawler:
  
-    urls = []
-    urls_done = [] 
-    count = 0
+
  
     def __init__(self, domain):
         self.domain = domain
         self.count = 0
+        self.urls = []
+        self.urls_done = [] 
+
  
     def getUrls(self):
         """
@@ -29,10 +30,10 @@ class Crawler:
 
     def run(self, url):
 
-        gen = self.crawl(url)      
-        for i in range(500):
+        self.gen = self.crawl(url)      
+        for i in range(9999):
             try:
-                gen.next()
+                self.gen.next()
             except:
                 pass
 

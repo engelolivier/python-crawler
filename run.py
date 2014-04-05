@@ -11,4 +11,6 @@ from crawler import *
 # On construit une liste d'url
 crawler = Crawler404("http://localhost:8000")
 # Point de départ
-crawler.run("http://localhost:8000/shop/")
+#crawler.run("http://localhost:8000/shop/")
+crawler.run("http://localhost:8000") 
+
